@@ -1,6 +1,6 @@
-import { Router } from "express"
+import { Router } from "express";
 
-const suspeitosRoutes = Router()
+const suspeitosRoutes = Router();
 
 let suspeitos = [
     {
@@ -30,33 +30,34 @@ let suspeitos = [
 ];
 
 suspeitosRoutes.get("/", (req, res) => {
-    return res.status(200)
-    .send(suspeitos);
+    return res.status(200).send(suspeitos);
 });
 
 suspeitosRoutes.post("/", (req, res) => {
     const { nome, idade, profissão, envolvimentoEmApostas, nivelDeSuspeita } = req.body;
-    if(!nome || !profissão || !nivelDeSuspeita) {
-        return res.status(400)
-        .send({ message: "Nome, profissão e nível de suspeita são obrigatórios" });
+    if (!nome || !profissão || !nivelDeSuspeita) {
+        return res.status(400).send({ message: "Nome, profissão e nível de suspeita são obrigatórios" });
     }
-})
+    const novoSuspeito = {
+        id: suspeitos.length + 1,
+        nome,
+        idade,
+        profissão,
+        envolvimentoEmApostas,
+        nivelDeSuspeita
+    };
+    suspeitos.push(novoSuspeito);
+    return res.status(201).send(novoSuspeito);
+});
 
 suspeitosRoutes.get("/:id", (req, res) => {
     const { id } = req.params;
-  
-    // Busca um candidato pelo id no array de candidatos
     const suspeito = suspeitos.find((suspeito) => suspeito.id == id);
-  
-    // Verifica se o candidato foi encontrado
     if (!suspeito) {
-      return res
-        .status(404)
-        .send({ message: `Suspeito com id ${id} não foi encontrado!` });
+        return res.status(404).send({ message: `Suspeito com id ${id} não foi encontrado!` });
     }
-  
-    return res.status(200).json(candidato);
-  });
+    return res.status(200).json(suspeito);
+});
 
 suspeitosRoutes.put("/:id", (req, res) => {
     const { id } = req.params;
@@ -65,8 +66,7 @@ suspeitosRoutes.put("/:id", (req, res) => {
     const suspeitoIndex = suspeitos.findIndex(suspeito => suspeito.id === Number(id));
 
     if (suspeitoIndex < 0) {
-        return res.status(404)
-        .send({ message: "Suspeito não encontrado" });
+        return res.status(404).send({ message: "Suspeito não encontrado" });
     }
 
     suspeitos[suspeitoIndex] = {
@@ -78,8 +78,7 @@ suspeitosRoutes.put("/:id", (req, res) => {
         nivelDeSuspeita
     };
 
-    return res.status(200)
-    .send(suspeitos[suspeitoIndex]);
+    return res.status(200).send(suspeitos[suspeitoIndex]);
 });
 
 suspeitosRoutes.delete("/:id", (req, res) => {
@@ -87,21 +86,14 @@ suspeitosRoutes.delete("/:id", (req, res) => {
     const suspeito = suspeitos.find((suspeito) => suspeito.id == id);
 
     if (!suspeito) {
-      return res
-        .status(404)
-        .send({ message: `suspeito com id ${id} não foi encontrado!` });
+        return res.status(404).send({ message: `Suspeito com id ${id} não foi encontrado!` });
     }
     suspeitos = suspeitos.filter((suspeito) => suspeito.id != id);
-  
+
     return res.status(200).send({
-      message: "Suspeito não encontrado!",
-      suspeito,
+        message: "Suspeito removido com sucesso!",
+        suspeito,
     });
-  });
-
-
-
-
-
+});
 
 export default suspeitosRoutes;
