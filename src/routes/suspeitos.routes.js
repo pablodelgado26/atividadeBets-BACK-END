@@ -44,17 +44,60 @@ suspeitosRoutes.post("/", (req, res) => {
 
 suspeitosRoutes.get("/:id", (req, res) => {
     const { id } = req.params;
-    const suspeito = suspeitos.find(suspeito => suspeito.id === Number(id));
-
+  
+    // Busca um candidato pelo id no array de candidatos
+    const suspeito = suspeitos.find((suspeito) => suspeito.id == id);
+  
+    // Verifica se o candidato foi encontrado
     if (!suspeito) {
+      return res
+        .status(404)
+        .send({ message: `Suspeito com id ${id} não foi encontrado!` });
+    }
+  
+    return res.status(200).json(candidato);
+  });
+
+suspeitosRoutes.put("/:id", (req, res) => {
+    const { id } = req.params;
+    const { nome, idade, profissão, envolvimentoEmApostas, nivelDeSuspeita } = req.body;
+
+    const suspeitoIndex = suspeitos.findIndex(suspeito => suspeito.id === Number(id));
+
+    if (suspeitoIndex < 0) {
         return res.status(404)
         .send({ message: "Suspeito não encontrado" });
     }
 
+    suspeitos[suspeitoIndex] = {
+        id: Number(id),
+        nome,
+        idade,
+        profissão,
+        envolvimentoEmApostas,
+        nivelDeSuspeita
+    };
+
     return res.status(200)
-    .send(suspeito);
+    .send(suspeitos[suspeitoIndex]);
 });
 
+suspeitosRoutes.delete("/:id", (req, res) => {
+    const { id } = req.params;
+    const suspeito = suspeitos.find((suspeito) => suspeito.id == id);
+
+    if (!suspeito) {
+      return res
+        .status(404)
+        .send({ message: `suspeito com id ${id} não foi encontrado!` });
+    }
+    suspeitos = suspeitos.filter((suspeito) => suspeito.id != id);
+  
+    return res.status(200).send({
+      message: "Suspeito não encontrado!",
+      suspeito,
+    });
+  });
 
 
 
